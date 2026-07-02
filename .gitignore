@@ -1,0 +1,16 @@
+# 認証情報（絶対にGitHubにあげない）
+credentials.json
+token.json
+
+# 仮想環境
+venv/
+
+# Djangoの設定
+*.pyc
+__pycache__/
+db.sqlite3
+.env
+
+# OS系
+.DS_Store
+Thumbs.db
