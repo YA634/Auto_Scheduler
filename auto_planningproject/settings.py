@@ -122,3 +122,5 @@ STATIC_URL = 'static/'
 import os
 GOOGLE_CREDENTIALS_FILE = os.path.join(BASE_DIR, 'credentials.json')
 GOOGLE_TOKEN_FILE = os.path.join(BASE_DIR, 'token.json')
+
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'

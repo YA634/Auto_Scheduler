@@ -36,3 +36,6 @@ def oauth_callback(request):
         'client_secret': creds.client_secret,
     }
     return JsonResponse({'message': 'ログイン成功'})
+
+def index_view(request):
+   return render(request, 'index.html')

@@ -1,7 +1,13 @@
 from rest_framework.routers import DefaultRouter
-from .views import TaskView
+
+from django.urls import path
+from .import views
 
 router = DefaultRouter()
-router.register(r'tasks', TaskView)
+router.register(r'tasks', views.TaskView)
 
-urlpatterns = router.urls
+urlpatterns = [
+    path('oauth/login/',views.oauth_login),
+    path('oauth/callback/',views.oauth_callback)
+]
+urlpatterns += router.urls
