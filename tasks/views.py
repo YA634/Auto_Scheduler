@@ -20,14 +20,39 @@ class TaskView(viewsets.ModelViewSet):
 #Googleログイン画面へリダイレクト
 def oauth_login(request):
     flow = get_flow()
-    auth_url, state = flow.authorization_url(prompt='consent')
-    request.session['state'] = state
+    auth_url, state = flow.authorization_url(
+        prompt='consent',
+        access_type='offline',
+    )
+    code_verifier = flow.code_verifier
+    # code_verifierをstateと一緒にキャッシュファイルに保存
+    import json, os
+    cache = {}
+    cache_file = 'oauth_cache.json'
+    if os.path.exists(cache_file):
+        with open(cache_file) as f:
+            cache = json.load(f)
+    cache[state] = code_verifier
+    with open(cache_file, 'w') as f:
+        json.dump(cache, f)
     return redirect(auth_url)
 
-#Googleログイン後に戻ってくるURL
 def oauth_callback(request):
+    state = request.GET.get('state')
+    import json, os
+    cache_file = 'oauth_cache.json'
+    code_verifier = None
+    if os.path.exists(cache_file):
+        with open(cache_file) as f:
+            cache = json.load(f)
+        code_verifier = cache.get(state)
+    print('callback code_verifier:', code_verifier)
     flow = get_flow()
-    flow.fetch_token(authorization_response=request.build_absolute_uri())
+    flow.fetch_token(
+        authorization_response=request.build_absolute_uri(),
+        state=state,
+        code_verifier=code_verifier
+    )
     creds = flow.credentials
     request.session['token'] = {
         'token': creds.token,

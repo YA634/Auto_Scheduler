@@ -2,6 +2,8 @@
 credentials.json
 token.json
 
+oauth_cache.json
+
 # 仮想環境
 venv/
 

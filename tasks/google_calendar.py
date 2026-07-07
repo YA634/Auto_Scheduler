@@ -12,6 +12,7 @@ def get_flow():
         scopes=SCOPES,
         redirect_uri='http://localhost:8000/oauth/callback/'
     )
+    flow.autogenerate_code_verifier = True
     return flow
 
 def get_service(token_data):
