@@ -1,10 +1,13 @@
 from django.shortcuts import render
 from rest_framework import viewsets
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from .models import Task
 from .serializers import TaskSerializer
 from django.shortcuts import redirect
 from django.http import JsonResponse
-from .google_calendar import get_flow
+from .google_calendar import get_flow, get_service, get_busy_slots
+
 
 class TaskView(viewsets.ModelViewSet):
   model = Task
@@ -64,3 +67,12 @@ def oauth_callback(request):
 
 def index_view(request):
    return render(request, 'index.html')
+
+class FreeSlotsView(APIView):
+    def get(self, request):
+        token = request.session.get('token')
+        if not token:
+            return Response({'error': 'ログインしてください'}, status=401)
+        service = get_service(token)
+        free_time = get_busy_slots(service)
+        return Response({'busy_slots':free_time})

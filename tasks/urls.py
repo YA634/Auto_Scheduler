@@ -8,6 +8,7 @@ router.register(r'tasks', views.TaskView)
 
 urlpatterns = [
     path('oauth/login/',views.oauth_login),
-    path('oauth/callback/',views.oauth_callback)
+    path('oauth/callback/',views.oauth_callback),
+    path('free-slots/',views.FreeSlotsView.as_view()),
 ]
 urlpatterns += router.urls
