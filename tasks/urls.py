@@ -10,5 +10,6 @@ urlpatterns = [
     path('oauth/login/',views.oauth_login),
     path('oauth/callback/',views.oauth_callback),
     path('free-slots/',views.FreeSlotsView.as_view()),
+    path('')
 ]
 urlpatterns += router.urls

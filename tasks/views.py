@@ -76,3 +76,15 @@ class FreeSlotsView(APIView):
         service = get_service(token)
         free_time = get_busy_slots(service)
         return Response({'busy_slots':free_time})
+    
+class CreateEventView(APIView):
+    def post(self, request):
+        token = request.session.get('token')
+        if not token:
+            return Response({'error': 'ログインしてください'}, status=401)
+        service = get_service(token)
+        title = request.data.get('title')
+        start_time = request.data.get('start_time')
+        end_time = request.data.get('end_time')
+        new_event = create_event(service, title, start_time, end_time)
+        return Response({'title':title,'start_time':start_time,'end_time':end_time})
