@@ -4,9 +4,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Task
 from .serializers import TaskSerializer
+from .scheduler import schedule_task
 from django.shortcuts import redirect
 from django.http import JsonResponse
-from .google_calendar import get_flow, get_service, get_busy_slots
+from .google_calendar import get_flow, get_service, get_busy_slots, create_event
 
 
 class TaskView(viewsets.ModelViewSet):
@@ -88,3 +89,17 @@ class CreateEventView(APIView):
         end_time = request.data.get('end_time')
         new_event = create_event(service, title, start_time, end_time)
         return Response({'title':title,'start_time':start_time,'end_time':end_time})
+    
+class ScheduleView(APIView):
+    def post(self, request):
+        token = request.session.get('token')
+        if not token:
+            return Response({'error': 'ログインしてください'}, status=401)
+        task_id = request.data.get('task_id')
+        task = Task.objects.get(id=task_id)
+        service = get_service(token)
+        busy_slots = get_busy_slots(service)
+        new_slots = schedule_task(task,busy_slots)
+        for slot in new_slots:
+            create_event(service, task.name, slot["start"].isoformat(), slot["end"].isoformat())
+        return Response({'message':'予定を作成しました','slots': len(new_slots)})

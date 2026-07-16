@@ -1,11 +1,11 @@
 from .models import Task
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 def parse_time(time_str):
     return datetime.fromisoformat(time_str.replace('Z', '+00:00'))
 
-def get_free_slots(busy_slots, deadline, min_hours=1):
-  free_slots = []
+def get_free_slots(busy_slots, deadline):
+  free_slots = []#予定の入っていない時間(辞書)のリスト
   now = datetime.now(timezone.utc)
   if not busy_slots:
      return[{'start': now, 'end': deadline, 'time': deadline - now}]
@@ -29,3 +29,21 @@ def get_free_slots(busy_slots, deadline, min_hours=1):
       'end': deadline
     })
   return free_slots
+
+def assign_task_to_slots(free_slots, task_hours):
+  # remaining = timedelta(hours=task_hours)
+  remaining = task_hours
+  new_slots=[]
+  for i in range(len(free_slots)):
+    if free_slots[i]["time"]>remaining:
+      new_slots.append({"time":remaining,"start":free_slots[i]["start"],"end":free_slots[i]["start"]+remaining})
+      break
+    else:
+      new_slots.append({"time":free_slots[i]["time"],"start":free_slots[i]["start"],"end":free_slots[i]["end"]})
+      remaining-=free_slots[i]["time"]
+  return new_slots
+
+def schedule_task(task, busy_slots):
+  free_slots = get_free_slots(busy_slots, task.deadline)
+  new_slots = assign_task_to_slots(free_slots, task.quote_time)
+  return new_slots
