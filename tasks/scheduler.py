@@ -31,6 +31,7 @@ def get_free_slots(busy_slots, deadline):
   return free_slots
 
 def assign_task_to_slots(free_slots, task_hours):
+  #予定作成
   # remaining = timedelta(hours=task_hours)
   remaining = task_hours
   new_slots=[]
@@ -44,6 +45,23 @@ def assign_task_to_slots(free_slots, task_hours):
   return new_slots
 
 def schedule_task(task, busy_slots):
+  #まとめて
   free_slots = get_free_slots(busy_slots, task.deadline)
   new_slots = assign_task_to_slots(free_slots, task.quote_time)
   return new_slots
+
+def detect_delay(task, scheduled_slots):
+  #遅延確認
+  for i in range(len(scheduled_slots)):
+    if (task.accomplished == False) and (scheduled_slots[i]["end"]<datetime.now(timezone.utc)):
+      return True
+  return False
+
+def reschedule_task(task, busy_slots):
+  # 遅延タスクを再スケジュール
+  free_slots = get_free_slots(busy_slots, task.deadline)
+  new_slots = assign_task_to_slots(free_slots, task.quote_time)
+  if new_slots[-1]["end"]>task.deadline:
+    return None
+  else:
+    return new_slots
