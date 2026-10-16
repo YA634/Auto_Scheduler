@@ -12,5 +12,6 @@ urlpatterns = [
     path('free-slots/',views.FreeSlotsView.as_view()),
     path('create-event/',views.CreateEventView.as_view()),
     path('schedule/',views.ScheduleView.as_view()),
+    path('reschedule/',views.RescheduleView.as_view()),
 ]
 urlpatterns += router.urls

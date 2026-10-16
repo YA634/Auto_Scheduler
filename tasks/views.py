@@ -100,6 +100,24 @@ class ScheduleView(APIView):
         service = get_service(token)
         busy_slots = get_busy_slots(service)
         new_slots = schedule_task(task,busy_slots)
+        if new_slots is None:
+            return Response({'message': '期日までに間に合いません、所要時間もしくは期日を見直してください！'}, status=400)
+        for slot in new_slots:
+            create_event(service, task.name, slot["start"].isoformat(), slot["end"].isoformat())
+        return Response({'message':'予定を作成しました','slots': len(new_slots)})
+
+class RescheduleView(APIView):
+    def post(self, request):
+        token = request.session.get('token')
+        if not token:
+            return Response({'error': 'ログインしてください'}, status=401)
+        task_id = request.data.get('task_id')
+        task = Task.objects.get(id=task_id)
+        service = get_service(token)
+        busy_slots = get_busy_slots(service)
+        new_slots = schedule_task(task,busy_slots)
+        if new_slots is None:
+            return Response({'message': '期日までに間に合いません、所要時間もしくは期日を見直してください！'}, status=400)
         for slot in new_slots:
             create_event(service, task.name, slot["start"].isoformat(), slot["end"].isoformat())
         return Response({'message':'予定を作成しました','slots': len(new_slots)})
